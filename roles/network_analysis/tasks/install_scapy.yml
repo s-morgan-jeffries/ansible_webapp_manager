@@ -1,0 +1,28 @@
+---
+- name: install scapy | install required apt packages
+  apt: name={{ item }} update_cache=yes cache_valid_time=86400
+  sudo: yes
+  with_items:
+      - gnuplot
+      - python-numpy
+      - cython
+      - python-scipy
+
+- name: install scapy | install pyx
+  pip:
+      name: pyx
+      version: 0.12.1
+      # virtualenv: "{{ python_virtualenv }}"
+      # executable: "{{ python_virtualenv }}/bin/pip"
+  sudo: yes
+  
+- name: install scapy | install gnuplot, crypto, and scapy
+  pip: 
+      name: "{{ item }}"
+      # virtualenv: "{{ python_virtualenv }}"
+      # executable: "{{ python_virtualenv }}/bin/pip"
+  with_items:
+      - http://prdownloads.sourceforge.net/gnuplot-py/gnuplot-py-1.8.tar.gz?download
+      - crypto
+      - scapy
+  sudo: yes

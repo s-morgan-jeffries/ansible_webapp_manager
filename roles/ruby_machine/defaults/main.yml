@@ -1,0 +1,5 @@
+---
+config_user: vagrant
+config_group: vagrant
+# rbenv_user: vagrant
+# rbenv_group: vagrant

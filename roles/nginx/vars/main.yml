@@ -1,0 +1,26 @@
+---
+nginx_version: 1.9.2
+nginx_url: http://nginx.org/download/nginx-{{ nginx_version }}.tar.gz
+download_dir: /home/vagrant/downloads
+nginx_tarfile: "{{ download_dir }}/nginx-{{ nginx_version }}.tar.gz"
+nginx_untarred_dir: "{{ download_dir }}/nginx-{{ nginx_version }}"
+nginx_module_flags: >
+    --with-http_ssl_module
+    --with-http_spdy_module
+    --with-http_realip_module
+    --with-http_stub_status_module
+
+nginx_ssl_dir: /etc/nginx/ssl
+nginx_ssl_certificate: "{{ nginx_ssl_dir }}/nginx.cert"
+nginx_ssl_key: "{{ nginx_ssl_dir }}/nginx.key"
+
+disable_default: yes
+web_root: /srv/www
+config_user: vagrant
+config_group: vagrant
+web_user: www-data
+web_group: www-data
+
+php_fpm_config: /etc/php5/fpm/php-fpm.conf
+php_fpm_pool_config: /etc/php5/fpm/pool.d/www.conf
+php_fpm_ini: /etc/php5/fpm/php.ini

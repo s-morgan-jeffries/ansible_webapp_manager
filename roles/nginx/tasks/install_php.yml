@@ -1,0 +1,116 @@
+---
+- name: install php | install python-software-properties
+  apt: name=python-software-properties update_cache=yes cache_valid_time=86400
+  sudo: yes
+  
+- name: install php | add ondrej php repo
+  apt_repository:
+      repo: ppa:ondrej/php5-5.6
+      update_cache: yes
+  sudo: yes
+
+- name: install php | install php and related
+  apt:
+      name: "{{ item }}"
+      update_cache: yes
+      cache_valid_time: 86400
+  sudo: yes
+  with_items:
+      - php5-fpm
+      - php5-cli
+      - php5-curl
+      - php5-gd
+      - php5-json
+      - php5-mcrypt
+      - php5-mysqlnd
+
+- name: install php | rewrite php-fpm configuration file
+  lineinfile:
+      dest: "{{ php_fpm_config }}"
+      regexp: ^.*({{ item.key | regex_replace('\.', '\\.') }})\s*=\s.*$
+      line: \1 = {{ item.val }}
+      backrefs: yes
+  with_items:
+      - key: emergency_restart_threshold
+        val: 0
+      - key: emergency_restart_interval
+        val: 0
+  sudo: yes
+  
+- name: install php | rewrite php-fpm pool configuration file
+  lineinfile:
+      dest: "{{ php_fpm_pool_config }}"
+      regexp: ^.*({{ item.key | regex_replace('\.', '\\.') }})\s*=\s.*$
+      line: \1 = {{ item.val }}
+      backrefs: yes
+  with_items:
+      - key: user
+        val: "{{ web_user }}"
+      - key: group
+        val: "{{ web_user }}"
+      - key: listen
+        val: /var/run/php5-fpm.sock
+      - key: listen.allowed_clients
+        val: 127.0.0.1
+      - key: listen.owner
+        val: "{{ web_user }}"
+      - key: listen.group
+        val: "{{ web_user }}"
+      - key: pm.max_children
+        val: 5
+      - key: pm.start_servers
+        val: 2
+      - key: pm.min_spare_servers
+        val: 1
+      - key: pm.max_spare_servers
+        val: 3
+      - key: pm.max_requests
+        val: 500
+      # - regexp: '^.*(slowlog)\s*=\s.*$'
+      #   line: '\1 = /share/logs/php5-fpm.slowlog.log'
+      # - regexp: '^.*(request_slowlog_timeout)\s*=\s.*$'
+      #   line: '\1 = 5s'
+      # - regexp: '^.*(catch_workers_output)\s*=\s.*$'
+      #   line: '\1 = yes'
+  sudo: yes
+
+- name: install php | rewrite php-fpm ini file
+  lineinfile:
+      dest: "{{ php_fpm_ini }}"
+      regexp: ^.*({{ item.key | regex_replace('\.', '\\.') }})\s*=\s.*$
+      line: \1 = {{ item.val }}
+      backrefs: yes
+  with_items:
+      - key: opcache.enable
+        val: 1
+      - key: opcache.memory_consumption
+        val: 64
+      - key: opcache.interned_string_buffers
+        val: 16
+      - key: opcache.max_accelerated_files
+        val: 4000
+      - key: opcache.validate_timestamps
+        val: 1
+      - key: opcache.revalidate_freq
+        val: 0
+      - key: opcache.fast_shutdown
+        val: 1
+      - key: file_uploads
+        val: 1
+      - key: upload_max_filesize
+        val: 10M
+      - key: max_file_uploads
+        val: 3
+      - key: max_execution_time
+        val: 5
+      # - key: session.save_handler
+      #   val: "'memcached'"
+      # - key: session.save_path
+      #   val: "'127.0.0.2:11211'"
+      - key: output_buffering
+        val: 4096
+      - key: implicit_flush
+        val: false
+      - key: realpath_cache_size
+        val: 64k
+  sudo: yes

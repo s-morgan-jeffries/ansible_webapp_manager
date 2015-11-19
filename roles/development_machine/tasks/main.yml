@@ -1,0 +1,18 @@
+---
+- name: install git
+  apt:
+      name: git-core
+      update_cache: yes
+      cache_valid_time: 86400
+  sudo: yes
+  
+- name: set up git config in home directory
+  template:
+      src: gitconfig.j2
+      dest: /home/vagrant/.gitconfig
+
+- name: clone app repo
+  git:
+      repo: "{{ app_repo }}"
+      dest: "{{ app_dir }}"
+      update: no

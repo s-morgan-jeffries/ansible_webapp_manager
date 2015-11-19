@@ -1,0 +1,5 @@
+---
+- include: install_python.yml
+- include: install_networking_tools.yml
+# - include: enable_port_forwarding.yml
+- include: enable_networking_scripts.yml

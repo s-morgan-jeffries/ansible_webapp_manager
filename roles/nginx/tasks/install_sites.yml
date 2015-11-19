@@ -1,0 +1,8 @@
+---
+- name: make sure the web root directory exists
+  file: path={{ web_root }} state=directory
+  sudo: yes
+  
+- include: install_site.yml site_name=site.com site_conf=site.conf.j2 site_dir=site
+# - include: install_site.yml site_name=site2.com site_conf=regex-site.conf.j2 site_dir=site2
+# - include: install_site.yml site_name=example.com site_conf=ssl_site.conf.j2 site_dir=ssl_site

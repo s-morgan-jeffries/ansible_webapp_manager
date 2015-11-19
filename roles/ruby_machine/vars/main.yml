@@ -1,0 +1,6 @@
+---
+rbenv_path: /usr/local/rbenv
+ruby_version: 2.2.3
+ruby_dir: "{{ rbenv_path }}/versions/{{ ruby_version }}"
+ruby_executable: "{{ ruby_dir }}/bin/ruby"
+gem_executable: "{{ ruby_dir }}/bin/gem"

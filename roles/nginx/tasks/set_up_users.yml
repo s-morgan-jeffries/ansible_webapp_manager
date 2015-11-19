@@ -1,0 +1,9 @@
+---
+- name: set up users | add vagrant to web group
+  user:
+      name: "{{ config_user }}"
+      group: "{{ config_group }}"
+      groups: "{{ web_group }}"
+      append: yes
+  sudo: yes
+

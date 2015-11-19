@@ -1,0 +1,10 @@
+---
+- name: install networking tools | install apt packages
+  apt: name={{ item }} update_cache=yes cache_valid_time=86400
+  sudo: yes
+  with_items:
+      - whois
+      - inetutils-traceroute
+      
+- include: install_wireshark.yml
+# - include: install_scapy.yml

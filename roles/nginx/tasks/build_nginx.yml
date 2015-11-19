@@ -1,0 +1,54 @@
+---
+- name: install required packages
+  apt: name={{ item }} update_cache=yes cache_valid_time=86400
+  with_items:
+      - build-essential
+      - libpcre3-dev
+      - zlib1g-dev
+      - libssl-dev
+  sudo: yes
+  
+- name: make sure downloads directory exists
+  file:
+      path: "{{ download_dir }}"
+      state: directory
+  # sudo: yes
+  
+- name: download source
+  get_url:
+      url: "{{ nginx_url }}"
+      dest: "{{ nginx_tarfile }}"
+  # sudo: yes
+  
+- name: unarchive nginx tarball
+  unarchive:
+      copy: no
+      src: "{{ nginx_tarfile }}"
+      dest: "{{ download_dir }}"
+      creates: "{{ nginx_untarred_dir }}"
+  # sudo: yes
+
+- name: run the configuration script
+  command: >
+      ./configure
+      --prefix=/usr
+      --conf-path=/etc/nginx
+      {{ nginx_module_flags }}
+  args:
+      chdir: "{{ nginx_untarred_dir }}"
+      creates: "{{ nginx_untarred_dir }}/Makefile"
+  # sudo: yes
+  
+- name: run the make utility
+  command: make
+  args:
+      chdir: "{{ nginx_untarred_dir }}"
+      creates: "{{ nginx_untarred_dir }}/objs/nginx"
+  # sudo: yes
+  
+- name: run make install
+  command: make install
+  args:
+      chdir: "{{ nginx_untarred_dir }}"
+      creates: /usr/sbin/nginx
+  sudo: yes

@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+pingstats() {
+    stats="$(ping "$@" | tail -n 2)"
+    packet_loss="$(echo "$stats" | head -n 1 | sed -E 's/^.+([[:digit:]]+)% packet loss.+$/\1/')"
+    avg="$(echo "$stats" | tail -n 1 | cut -d '=' -f 2 | cut -d '/' -f 2)"
+    echo "% packet loss : average ping time (ms)"
+    echo "$packet_loss:$avg"
+}
+pingstats "$@"

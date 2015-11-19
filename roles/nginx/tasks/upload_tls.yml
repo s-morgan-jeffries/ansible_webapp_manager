@@ -1,0 +1,24 @@
+---
+- name: make tls directory
+  file:
+      path: "{{ nginx_ssl_dir }}"
+      state: directory
+  sudo: yes
+  when: not do_reset | bool
+  
+- name: remove tls directory
+  file:
+      path: "{{ nginx_ssl_dir }}"
+      state: absent
+  sudo: yes
+  when: do_reset | bool
+    
+- name: updload TLS certificate
+  copy: src=nginx.cert dest={{ nginx_ssl_certificate }}
+  sudo: yes
+  when: not do_reset | bool
+  
+- name: updload TLS key
+  copy: src=nginx.key dest={{ nginx_ssl_key }}
+  sudo: yes
+  when: not do_reset | bool

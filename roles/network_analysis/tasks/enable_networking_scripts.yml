@@ -1,0 +1,6 @@
+---
+- name: add scripts directory to PATH
+  lineinfile: dest=/home/{{ network_user }}/.bashrc line='export PATH="{{ scripts_dir }}:$PATH"'
+
+- name: add python scripts directory to PATH
+  lineinfile: dest=/home/{{ network_user }}/.bashrc line='export PATH="{{ python_scripts_dir }}:$PATH"'

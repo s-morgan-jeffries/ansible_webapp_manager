@@ -1,0 +1,17 @@
+---
+- name: configure development machine
+  hosts: development
+  # vars_prompt:
+  #     - name: git_name
+  #       prompt: username for git edits
+  #       private: no
+  #       confirm: yes
+  #     - name: git_email
+  #       prompt: email address for git edits
+  #       private: no
+  #       confirm: yes
+  vars:
+      git_name: S Morgan Jeffries
+      git_email: s.morgan.jeffries@gmail.com
+  roles:
+      - development_machine

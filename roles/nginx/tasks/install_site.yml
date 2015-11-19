@@ -1,0 +1,52 @@
+---
+- name: install {{ site_name }} | add site configuration to site-available
+  template: src={{ site_conf | default(site_name + '.conf.j2') }} dest=/etc/nginx/sites-available/{{ site_name }}
+  sudo: yes
+
+- name: install {{ site_name }} | enable configuration
+  file:
+      src: /etc/nginx/sites-available/{{ site_name }}
+      dest: /etc/nginx/sites-enabled/{{ site_name }}
+      state: link
+  sudo: yes
+  
+- name: install {{ site_name }} | remove the old site directory if present
+  file:
+      path: "{{ web_root }}/{{ site_name }}"
+      state: absent
+  sudo: yes
+
+- name: install {{ site_name }} | create the site directory
+  file:
+      path: "{{ web_root }}/{{ site_name }}"
+      state: directory
+      owner: www-data
+      group: www-data
+  sudo: yes
+  
+# - debug: msg="{{ poop | default(site_name) }}"
+
+- name: install {{ site_name }} | upload the site directory
+  copy:
+      src: "{{ site_dir | default(site_name) }}/"
+      dest: "{{ web_root }}/{{ site_name }}"
+      owner: www-data
+      group: www-data
+  sudo: yes
+
+# - name: install {{ site_name }} | get a list of executable files
+- name: install {{ site_name }} | set file permissions
+  file:
+      path: "{{ web_root }}/{{ site_name }}/cgi-bin/"
+      state: directory
+      recurse: yes
+      mode: ug+x
+  sudo: yes
+      
+# - name: upload the site directory
+#   template:
+#       src: "{{ item }}"
+#       dest: "{{ web_root }}/{{ site_name }}/{{ item | basename | regex_replace('\\.j2', '') }}"
+#   with_fileglob:
+#       - "{{ site_dir | default(site_name) }}/*.j2"
+#   sudo: yes

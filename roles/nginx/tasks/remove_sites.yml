@@ -1,0 +1,17 @@
+---
+- name: remove the web root directory
+  file: path={{ web_root }} state=absent
+  sudo: yes
+  
+- name: remove all site configuration
+  file: path=/etc/nginx/sites-enabled state=absent
+  sudo: yes
+  
+- name: replace the sites-enabled directory
+  file: path=/etc/nginx/sites-enabled state=directory
+  sudo: yes
+
+- name: enable default site
+  file: src=/etc/nginx/sites-available/default dest=/etc/nginx/sites-enabled/default state=link
+  sudo: yes
+  when: not disable_default

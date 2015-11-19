@@ -1,0 +1,85 @@
+upstream rails_app {
+    server 127.0.0.1:3000;
+}
+
+# Server is a context directive. This is defining a new virtual server.
+server {
+    # The listen directive. This listens on all interfaces at port 80. This is a very non-specific directive. If any other server directives are created and listen on a specific ip address, those will win. 
+    listen *:80;
+    # listen *:81;
+    # Here's how you would listen for https requests:
+    # listen *:443 ssl;
+    # This would cause this to be the default server:
+    # listen *:80 default_server;
+    
+    # Used to match server by hostname. This only comes into play if there's no clearly most-specific listen directive.
+    # server_name {{ site_name }} *.{{ site_name }}.192.168.33.10.xip.io;
+    
+    # List places to check for the site index.
+    # index index.html;
+    root /opt/rails_basic_app;
+    proxy_intercept_errors on;
+    
+    location / {
+        # root {{ web_root }}/{{ site_name }}/html;
+        error_page 404 /404.html;
+        error_page 500 502 503 504 /500.html;
+        try_files $uri $uri/index.html @rails;
+    }
+    
+    # location /assets {
+    #     expires max;
+    #     add_header Cache-Control public;
+    # }
+    
+    location @rails {
+        proxy_pass http://rails_app;
+    }
+    
+    location = /404.html {
+        root /opt/rails_basic_app/public;
+        internal;
+    }
+    
+    location = /500.html {
+        root /opt/rails_basic_app/public;
+        internal;
+    }
+    
+    # Match certain file extensions
+    # location ~* \.js$ {
+    #     root {{ web_root }}/{{ site_name }}/js;
+    # }
+    #
+    # location ~* \.css$ {
+    #     root {{ web_root }}/{{ site_name }}/css;
+    # }
+    #
+    # location ~* \.(gif|JPG|jpeg)$ {
+    #     root {{ web_root }}/{{ site_name }}/images;
+    # }
+    #
+    # location ~ \.php$ {
+    #     root {{ web_root }}/{{ site_name }}/cgi-bin;
+    #     fastcgi_pass unix:/var/run/php5-fpm.sock;
+    #     fastcgi_index index.php;
+    #     include fastcgi_params;
+    #     fastcgi_param  SCRIPT_FILENAME    $document_root$fastcgi_script_name;
+    # }
+    
+    # location /yourmother/ {
+    #     alias {{ web_root }}/{{ site_name }}/whore/;
+    # }
+    #
+    # location = /yourmother/favorite-things.html {
+    #     alias {{ web_root }}/{{ site_name }}/your-mothers-favorite-things.html;
+    # }
+    #
+    # location = /tryfiles {
+    #     try_files poop.html monkeybutt.html =404;
+    # }
+    
+    # location @triedandfailed {
+    #     alias {{ web_root }}/{{ site_name }}/tried-and-failed.html;
+    # }
+}

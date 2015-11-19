@@ -1,0 +1,11 @@
+---
+- include: set_up_users.yml
+- include: install_nginx.yml
+# - include: install_php.yml
+- include: install_ruby.yml
+- include: upload_tls.yml
+- include: install_sites.yml
+  when: not do_reset | bool
+- include: remove_sites.yml
+  when: do_reset | bool
+- include: restart_nginx.yml

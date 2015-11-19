@@ -1,0 +1,55 @@
+---
+- name: install python | add python-software-properties
+  apt: name=python-software-properties update_cache=yes cache_valid_time=86400
+  sudo: yes
+  
+- name: install python | install pip
+  apt: name=python-pip update_cache=yes cache_valid_time=86400
+  sudo: yes
+
+- name: install python | add deadsnakes repository #(for python other than 2.7)
+  apt_repository:
+      repo: ppa:fkrull/deadsnakes
+      update_cache: yes
+  sudo: yes
+  # when: not python_version == 2.7
+  
+- name: install python | install python version #(for python other than 2.7)
+  apt: name=python{{ python_version }} update_cache=yes cache_valid_time=86400 force=yes
+  sudo: yes
+  # when: not python_version == 2.7
+
+- name: set up virtualenv | install virtualenv
+  pip: name=virtualenv
+  sudo: yes
+  # when: not python_version == 2.7
+  
+- name: set up virtualenv | create virtualenv
+  command: virtualenv {{ python_virtualenv }} -p python{{ python_version }}
+  args:
+      creates: "{{ python_virtualenv }}"
+  sudo: yes
+  # when: not python_version == 2.7
+  
+# - name: set up virtualenv | install ipython
+#   pip:
+#       name: ipython
+#       virtualenv: "{{ python_virtualenv }}"
+#       executable: "{{ python_virtualenv }}/bin/pip"
+#   sudo: yes
+#   # when: not python_version == 2.7
+  
+- name: set up virtualenv | install ipython
+  pip: 
+      name: ipython
+      virtualenv: "{{ python_virtualenv }}"
+      executable: "{{ python_virtualenv }}/bin/pip"
+  sudo: yes
+  
+- name: set up virtualenv | activate virtualenv on login
+  lineinfile: dest=/home/{{ network_user }}/.bashrc line='source {{ python_virtualenv }}/bin/activate'
+  # when: not python_version == 2.7
+  
+- name: add scripts directory to python path
+  lineinfile: dest=/etc/environment line='PYTHONPATH="{{ python_scripts_dir }}"'
+  sudo: yes

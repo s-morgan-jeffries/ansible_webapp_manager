@@ -1,0 +1,4 @@
+---
+dev_user: vagrant
+dev_group: vagrant
+app_dir: /home/{{ dev_user }}/app

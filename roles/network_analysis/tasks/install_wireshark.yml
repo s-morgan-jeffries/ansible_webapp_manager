@@ -1,0 +1,24 @@
+---
+- name: install wireshark | install apt package
+  apt: name=wireshark update_cache=yes cache_valid_time=86400
+  sudo: yes
+
+- name: install wireshark | check to see if the wireshark group exists
+  shell: cat /etc/group | grep wireshark
+  register: shell_out
+  ignore_errors: yes
+- set_fact: wireshark_group_exists={{ shell_out.stdout != "" }}
+
+- name: configure wireshark | set default selections to allow non-root users to capture
+  shell: debconf-get-selections | grep wireshark-common | sed 's/false/true/' | debconf-set-selections
+  sudo: yes
+  when: not wireshark_group_exists
+
+- name: configure wireshark | run dpkg-reconfigure non-interactively
+  command: dpkg-reconfigure -f noninteractive wireshark-common
+  sudo: yes
+  when: not wireshark_group_exists
+
+- name: configure wireshark | add user to wireshark group
+  user: name={{ network_user }} groups="wireshark" append=yes
+  sudo: yes

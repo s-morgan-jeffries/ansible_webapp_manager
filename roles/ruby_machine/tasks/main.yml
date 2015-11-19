@@ -1,0 +1,73 @@
+---
+- name: install ruby | install required packages
+  apt:
+      name: "{{ item }}"
+      update_cache: yes
+      cache_valid_time: 86400
+  with_items:
+      - git-core
+      - curl
+      - zlib1g-dev
+      - build-essential
+      - libssl-dev
+      - libreadline-dev
+      - libyaml-dev
+      - libsqlite3-dev
+      - sqlite3
+      - libxml2-dev
+      - libxslt1-dev
+      - libcurl4-openssl-dev
+      - python-software-properties
+      - libffi-dev
+  sudo: yes
+
+- name: install ruby | install rbenv
+  git:
+      repo: git://github.com/sstephenson/rbenv.git
+      dest: "{{ rbenv_path }}"
+      accept_hostkey: yes
+  sudo: yes
+
+- name: install ruby | install ruby-build
+  git:
+      repo: git://github.com/sstephenson/ruby-build.git
+      dest: "{{ rbenv_path }}/plugins/ruby-build"
+      accept_hostkey: yes
+  sudo: yes
+
+- name: install ruby | install rbenv-gem-rehash
+  git:
+      repo: git://github.com/sstephenson/rbenv-gem-rehash.git
+      dest: "{{ rbenv_path }}/plugins/rbenv-gem-rehash"
+      accept_hostkey: yes
+  sudo: yes
+
+- name: install ruby | set ownership of rbenv
+  file:
+      path: "{{ rbenv_path }}"
+      state: directory
+      recurse: yes
+      owner: "{{ config_user }}"
+      group: "{{ config_group }}"
+  sudo: yes
+
+- name: install ruby | copy rbenv.sh to profile.d
+  template:
+      src: rbenv.sh.j2
+      dest: /etc/profile.d/rbenv.sh
+      mode: a+x
+  sudo: yes
+
+- name: install ruby | install ruby version
+  command: bash -lc "rbenv install {{ ruby_version }}"
+  args:
+      creates: "{{ ruby_dir }}"
+  
+# - name: install ruby | set ownership of rbenv
+#   file:
+#       path: "{{ rbenv_path }}"
+#       state: directory
+#       recurse: yes
+#       owner: "{{ web_user }}"
+#       group: "{{ web_group }}"
+#   sudo: yes

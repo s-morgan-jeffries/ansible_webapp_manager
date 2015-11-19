@@ -1,0 +1,12 @@
+---
+- name: install nodejs | add nodesource repo
+  command: bash -lc "curl -sL https://deb.nodesource.com/setup_0.12 | sudo bash -"
+  args:
+      creates: /etc/apt/sources.list.d/nodesource.list
+      
+- name: install ruby | install node
+  apt:
+      name: nodejs
+      update_cache: yes
+      cache_valid_time: 86400
+  sudo: yes
